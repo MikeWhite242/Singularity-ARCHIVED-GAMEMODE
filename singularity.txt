@@ -1,0 +1,7 @@
+"singularity"
+{
+	"base"			"sandbox"
+	"title"			"Singularity"
+	"author" 		"Mike White & Apsys"
+	"menusystem"	"1"
+}
