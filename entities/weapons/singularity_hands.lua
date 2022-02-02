@@ -1,3 +1,5 @@
+--These are impulse hands, full credit goes to vin ---
+
 AddCSLuaFile()
 
 
