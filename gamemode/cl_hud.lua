@@ -2,12 +2,29 @@
 concommand.Add("singularity_toggle_dev_hud", function()
 	local ply = LocalPlayer()
 
+	if (!ply:IsDeveloper()) then
+		ply:ChatPrint("You don't seem like a developer to me.")
+		return
+	end
+	
 	if ( !ply.DevHudEnabled ) then
 		SetGlobalBool("devhud", true)
 		ply.DevHudEnabled = true
 	else	
 		SetGlobalBool("devhud", false)
 		ply.DevHudEnabled = false
+	end
+end)
+
+concommand.Add("singularity_toggle_thirdperson", function()
+	local client = LocalPlayer()
+
+	if ( !client.Thirdperson ) then
+		SetGlobalBool("thirdperson", true)
+		client.Thirdperson = true
+	else
+		SetGlobalBool("thirdperson", false)
+		client.Thirdperson = false
 	end
 end)
 
@@ -114,6 +131,80 @@ hook.Add("HUDPaint", "Test2", function()
 		draw.SimpleTextOutlined("PREVIEW BUILD", "Singularity", 537.5, 422, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 255,0,0, 255 ))
 	end
 end)
+
+function GM:ShouldDrawLocalPlayer()
+	if GetGlobalBool("thirdperson", false) == true then
+		return true
+	end
+end
+
+function GM:CalcView(player, origin, angles,fov)
+	if GetGlobalBool("thirdperson", false) == true and player:GetViewEntity() == player then
+		local angles = player:GetAimVector():Angle()
+		local targetpos = Vector(0, 0, 60)
+
+		if player:KeyDown(IN_DUCK) then
+			if player:GetVelocity():Length() > 0 then
+				targetpos.z = 50
+			else
+				targetpos.z = 40
+			end
+		end
+
+		player:SetAngles(angles)
+
+		local pos = targetpos
+
+		local offset = Vector(5, 5, 5)
+
+		offset.x = 75
+		offset.y = 20
+		offset.z = 5
+		angles.yaw = angles.yaw + 3
+
+		local t = {}
+
+		t.start = player:GetPos() + pos
+		t.endpos = t.start + angles:Forward() * -offset.x
+
+		t.endpos = t.endpos + angles:Right() * offset.y
+		t.endpos = t.endpos + angles:Up() * offset.z
+		t.filter = function(ent)
+			if ent == LocalPlayer() then
+				return false
+			end
+			
+			if ent.GetNoDraw(ent) then
+				return false
+			end
+
+			return true
+		end
+		
+		local tr = util.TraceLine(t)
+
+		pos = tr.HitPos
+
+		if (tr.Fraction < 1.0) then
+			pos = pos + tr.HitNormal * 5
+		end
+
+		local fov = 90
+		local wep = player:GetActiveWeapon()
+
+		if wep and IsValid(wep) and wep.GetIronsights and not wep.NoThirdpersonIronsights then
+			fov = Lerp(FrameTime() * 15, wep.FOVMultiplier, wep:GetIronsights() and wep.IronsightsFOV or 1) * fov
+		end
+
+		local delta = player.EyePos(player) - origin
+
+		return {
+			origin = pos + delta,
+			angles = angles,
+			fov = fov
+		}
+	end
+end
 -- END OF DEV HUD
 hook.Add("HUDPaint", "MyAddonHUD", function()
 	local client = LocalPlayer()

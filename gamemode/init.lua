@@ -22,16 +22,16 @@ function GM:PlayerLoadout(ply)
 	
 end
 
-function GM:PlayerSpawn( ply, transiton )
+function GM:PlayerSpawn(pl, transition)
 
-	ply:SetRunSpeed(200)
-	ply:SetWalkSpeed(118)
-	ply:SetSlowWalkSpeed(70)
-	ply:SetDuckSpeed(0.2)
+	pl:SetRunSpeed(200)
+	pl:SetWalkSpeed(118)
+	pl:SetSlowWalkSpeed(70)
+	pl:SetDuckSpeed(0.2)
 
-	ply:Give("singularity_hands")
+	pl:Give("singularity_hands")
 
-	player_manager.SetPlayerClass( pl, "citizen_male" )
+	player_manager.SetPlayerClass( pl, "player_sandbox" )
 
 	BaseClass.PlayerSpawn( self, pl, transiton )
 
