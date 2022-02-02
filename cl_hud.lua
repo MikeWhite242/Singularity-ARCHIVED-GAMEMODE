@@ -57,6 +57,15 @@ surface.CreateFont("Singularity", {
 	extended = true,
 } )
 
+for value = 0, 100 do
+    surface.CreateFont("SingularityFont"..tostring(value),{
+        font = "Arial",
+        size = tonumber(value),
+        weight = 1000,
+		extended = true
+    })
+end
+
 surface.CreateFont("SingularitySmall", { 
 	font = "Arial",
 	size = 16 ,
@@ -124,13 +133,14 @@ end)
 hook.Add("HUDPaint", "MyAddo2nHUD", function()
 	local client = LocalPlayer()
 	local hp = client:Health()
+	local armour = client:Armor()
 
 	if (!client:Alive()) then
 		return
 	end
 	draw.RoundedBox(4, 7, ScrH()-189, 280, 182, Color(50,50,50, 200))
 	draw.SimpleTextOutlined("Health: " .. hp, "SingularityHealth", 20, 655, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 100,100,100, 255 ))
-	draw.SimpleTextOutlined("Armor: " .. LocalPlayer():Armor(), "SingularityHealth", 20, 675, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 100,100,100, 255 ))
+	draw.SimpleTextOutlined("Armor: " ..armour, "SingularityHealth", 20, 675, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 100,100,100, 255 ))
 	draw.SimpleTextOutlined("" .. LocalPlayer():Name(), "SingularityHealth", 20, 595, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 100,100,100, 255 ))
 end)
 
