@@ -80,24 +80,38 @@ surface.CreateFont("AmmoBigFont", {
 
 -- DEV HUD
 hook.Add("HUDPaint", "Test2", function()
+	local ply = LocalPlayer()
+	if (!ply:Alive()) then
+		return
+	end
 	draw.RoundedBox(4, 526, ScrH()-370, 160, 1.5, Color(255,255,255, 255))
 	draw.SimpleTextOutlined("SINGULARITY", "Singularity", 540, 355, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 0,0,255, 255 ))
 	draw.SimpleTextOutlined("VERSION: 0.1", "Singularity", 547, 375, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 0,0,255, 255 ))
-	draw.SimpleTextOutlined("AUTHOR: MIKE WHITE", "Singularity", 538.5, 402, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 255,0,0, 255 ))
+	draw.SimpleTextOutlined("AUTHOR: MIKE WHITE & APSYS", "Singularity", 538.5, 402, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 255,0,0, 255 ))
 	draw.SimpleTextOutlined("PREVIEW BUILD", "Singularity", 537.5, 422, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 255,0,0, 255 ))
-
-	if hp == 0 then
-		return false
-	end
 end)
 -- END OF DEV HUD
-local client = LocalPlayer()
 hook.Add("HUDPaint", "MyAddonHUD", function()
+	local client = LocalPlayer()
+	local wep =  client:GetActiveWeapon()
+	local c1 = wep:Clip1() or 0
+	local c2 = p:GetAmmoCount(wep:GetPrimaryAmmoType()) or 0
+
+	if (!client:Alive()) then
+		return
+	end
 
 	local Texture1 = Material("litenetwork/icons/ammo.png") 
 
-	if (client:GetActiveWeapon():Clip1() != -1) then
-		draw.SimpleTextOutlined( "" .. client:GetActiveWeapon():Clip1() .. "/" .. client:GetAmmoCount(client:GetActiveWeapon():GetPrimaryAmmoType()), "AmmoBigFont",1235.5, 685, Color(255,255,255,255), 0, 0, 1, Color( 255,0,0, 255 ))
+	if (wep) then
+            if c1 == -1 and c2 == 0 then
+                draw.SimpleTextOutlined("", "AmmoBigFont", 1235.5, 685, color_white,nil,nil,1,color_black)
+            elseif c1 == 0 and c2 == 0 then
+                draw.SimpleTextOutlined("0", "AmmoBigFont", 1235.5, 685, color_white,nil,nil,1,color_black)
+            else
+                draw.SimpleTextOutlined(""..c1.."/"..c2, "AmmoBigFont", 1235.5, 685, color_white,nil,nil,1,color_black)
+            end
+        end
 
 		surface.SetMaterial(Texture1)
 	    surface.SetDrawColor(Color(150,150,150, 255))
@@ -108,15 +122,16 @@ hook.Add("HUDPaint", "MyAddonHUD", function()
 end)
 
 hook.Add("HUDPaint", "MyAddo2nHUD", function()
-	local hp = LocalPlayer():Health()
+	local client = LocalPlayer()
+	local hp = client:Health()
+
+	if (!client:Alive()) then
+		return
+	end
 	draw.RoundedBox(4, 7, ScrH()-189, 280, 182, Color(50,50,50, 200))
 	draw.SimpleTextOutlined("Health: " .. hp, "SingularityHealth", 20, 655, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 100,100,100, 255 ))
 	draw.SimpleTextOutlined("Armor: " .. LocalPlayer():Armor(), "SingularityHealth", 20, 675, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 100,100,100, 255 ))
 	draw.SimpleTextOutlined("" .. LocalPlayer():Name(), "SingularityHealth", 20, 595, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 100,100,100, 255 ))
-
-	if hp == 0 then
-		return false
-	end
 end)
 
 local crosshairGap = 5
