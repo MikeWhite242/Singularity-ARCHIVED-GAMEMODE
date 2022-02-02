@@ -9,7 +9,7 @@ GM.Website 	= "None"
 singularity = singularity or {}
 singularity.lib = singularity.lib or {}
 
-singularity.__VERSION = "1.0"
+singularity.__VERSION = "2.0"
 singularity.__DISPLAY = "Singularity Framework"
 singularity.__XTNOTES = "PREVIEW BUILD"
 
@@ -18,6 +18,7 @@ singularity.Config.MainColor        = Color( 73, 123, 240)
 singularity.Config.DefaultTextColor = Color( 245, 245, 245 )
 singularity.Config.BGColorDark      = Color( 44,  44,  46  )
 singularity.Config.BGColorLight     = Color( 229, 229, 234  )
+singularity.Config.InteractColour	= Color( 214,188,39)
 singularity.Config.ConsolePrefix    = "[Singularity]"
 singularity.Config.VoiceRange       = 600
 
@@ -142,15 +143,24 @@ function singularity.includeDir( scanDirectory, core )
 end
 
 if SERVER then
+	MsgC(Color(10,132,255),"[SINGULARITY] loading gamemode...\n")
+	singularity.includeDir("singularity")
 	MsgC(Color(10,132,255),"[SINGULARITY] loading plugins...\n")
 	singularity.includeDir("singularity/plugins")
 	MsgC(Color(10,132,255),"[SINGULARITY] loading metas...\n")
 	singularity.includeDir("singularity/meta")
+	MsgC(Color(10,132,255),"[SINGULARITY] loading VGUI's...\n")
+	singularity.includeDir("singularity/vgui")
 end
 
 if CLIENT then 
+	MsgC(Color(10,132,255),"[SINGULARITY] loading gamemode...\n")
+	singularity.includeDir("singularity")
 	MsgC(Color(10,132,255),"[SINGULARITY] loading plugins...\n")
 	singularity.includeDir("singularity/plugins")
 	MsgC(Color(10,132,255),"[SINGULARITY] loading metas...\n")
 	singularity.includeDir("singularity/meta")
+	MsgC(Color(10,132,255),"[SINGULARITY] loading VGUI's...\n")
+	singularity.includeDir("singularity/vgui")
+
 end

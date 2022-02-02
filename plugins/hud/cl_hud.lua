@@ -6,7 +6,7 @@ local function DrawEntInfo(target, alpha)
 	local scrH = ScrH()
 	local hudName = target.HUDName
 	local hudDesc = target.HUDDesc
-	local hudCol = target.HUDColour or impulse.Config.InteractColour
+	local hudCol = target.HUDColour or singularity.Config.InteractColour
 
 	draw.DrawText(hudName, "SingularityFont19", pos.x, pos.y, ColorAlpha(hudCol, alpha), 1)
 
@@ -19,9 +19,7 @@ CreateClientConVar("singularity_thirdperson_fov", 70, true,true, "Choose a FOV",
 
 concommand.Add("singularity_toggle_dev_hud", function()
 	local ply = LocalPlayer()
-
-
-	if (ply:SteamID64() == "76561199172557482" or ply:SteamID64() == "76561198373309941") then
+	if (ply:SteamID() == "STEAM_0:0:606145877" or ply:SteamID() == "STEAM_0:1:206522106") then
 		if ( !ply.DevHudEnabled ) then
 			SetGlobalBool("devhud", true)
 			ply.DevHudEnabled = true
@@ -29,9 +27,6 @@ concommand.Add("singularity_toggle_dev_hud", function()
 			SetGlobalBool("devhud", false)
 			ply.DevHudEnabled = false
 		end
-	else
-		ply:ChatPrint("how about no?")
-		return
 	end
 end)
 
@@ -129,24 +124,24 @@ hook.Add("HUDPaint", "Test2", function()
 	local sw, sh = ScrW(), ScrH()
 	local trace = p:GetEyeTraceNoCursor()
 	local entTrace = trace.Entity
-	if (!ply:Alive() and ply:IsDeveloper()) then
-		return
-	end
-	if (GetGlobalBool("devhud", true) == true) then
 
-		local Texture1 = Material("litenetwork/logotext.png") 
-		surface.SetMaterial(Texture1)
-		surface.SetDrawColor(Color(41, 128, 185, 255))
-		surface.DrawTexturedRect(480, 275, 520, 60, Color(41, 128, 185, 255))
+	if (ply:Alive() and ply:SteamID64() == "76561199172557482" or ply:SteamID64() == "76561198373309941") then
+		if (GetGlobalBool("devhud", true) == true) then
 
-		draw.RoundedBox(4, 526, ScrH()-370, 160, 1.5, Color(255,255,255, 255))
-		draw.SimpleTextOutlined("SINGULARITY", "Singularity", 540, 355, Color( 255, 255, 255, 255 ), 0, 0, 0.85, singularity.Config.MainColor)
-		draw.SimpleTextOutlined("VERSION: 0.1", "Singularity", 547, 375, Color( 255, 255, 255, 255 ), 0, 0, 0.85, singularity.Config.MainColor)
-		draw.SimpleTextOutlined("AUTHOR: MIKE WHITE & APSYS", "Singularity", 538.5, 402, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 255,0,0, 255 ))
-		draw.SimpleTextOutlined("PREVIEW BUILD", "Singularity", 537.5, 422, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 255,0,0, 255 ))
-		if IsValid(entTrace) then
-			if (CLIENT) then 
-				draw.SimpleText(""..string.upper(entTrace:GetClass() .."\n/\n" .. entTrace:GetModel()), "Singularity", sw - 1050, sh - 280, singularity.Config.MainColor)
+			local Texture1 = Material("litenetwork/logotext.png") 
+			surface.SetMaterial(Texture1)
+			surface.SetDrawColor(Color(41, 128, 185, 255))
+			surface.DrawTexturedRect(480, 275, 520, 60, Color(41, 128, 185, 255))
+
+			draw.RoundedBox(4, 526, ScrH()-370, 160, 1.5, Color(255,255,255, 255))
+			draw.SimpleTextOutlined("SINGULARITY", "Singularity", 540, 355, Color( 255, 255, 255, 255 ), 0, 0, 0.85, singularity.Config.MainColor)
+			draw.SimpleTextOutlined("VERSION: "..singularity.__VERSION, "Singularity", 547, 375, Color( 255, 255, 255, 255 ), 0, 0, 0.85, singularity.Config.MainColor)
+			draw.SimpleTextOutlined("AUTHOR: MIKE WHITE & APSYS", "Singularity", 538.5, 402, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 255,0,0, 255 ))
+			draw.SimpleTextOutlined(""..singularity.__XTNOTES , "Singularity", 537.5, 422, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 255,0,0, 255 ))
+			if IsValid(entTrace) then
+				if (CLIENT) then 
+					draw.SimpleText(""..string.upper(entTrace:GetClass() .."\n/\n" .. entTrace:GetModel()), "Singularity", sw - 1050, sh - 280, singularity.Config.MainColor)
+				end
 			end
 		end
 	end

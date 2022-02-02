@@ -12,19 +12,6 @@ function PLAYER:IsDeveloper()
 	return (self:SteamID64() == "76561199172557482" or self:SteamID64() == "76561198373309941")
 end
 
-function PLAYER:IsWeaponRaised()
-	local weapon = self:GetActiveWeapon()
-
-	if IsValid(weapon) then
-		if weapon.IsAlwaysRaised or false then
-			return true
-		elseif weapon.IsAlwaysLowered then
-			return false
-		end
-	end
-
-	return self:GetNWBool("weaponRaised", true)
-end
 
 function PLAYER:IsAnAdmin()
 	return (self:GetUserGroup() == "admin")
@@ -39,6 +26,7 @@ function PLAYER:IsDonator()
 end
 
 if ( SERVER ) then
+	util.AddNetworkString("singularityNotify")
 	local PLAYER = FindMetaTable("Player")
 
 	function PLAYER:NearEntity(entity, radius)
@@ -48,6 +36,15 @@ if ( SERVER ) then
 			end
 		end
 		return false
+	end
+
+	function PLAYER:Notify(message,duration)
+		if not message then return end
+		duration = duration or 5
+		net.Start("singularityNotify")
+			net.WriteString(message)
+			net.WriteInt(duration,32)
+		net.Send(self)
 	end
 
 	--[[
@@ -75,5 +72,12 @@ if ( SERVER ) then
 			end
 		end
 		return false
+	end
+else
+	local PLAYER = FindMetaTable("Player")
+	function PLAYER:Notify(message,duration)
+		local panel = vgui.Create("singularityNotifyPanel")
+		panel:SetDuration(duration or 5)
+		panel:SetMessage(message)
 	end
 end

@@ -54,7 +54,7 @@ if ( SERVER ) then
 	function ENT:SpawnFunction(ply, trace)
         local angles = ply:GetAngles()
 
-		local entity = ents.Create("ix_ammo_box")
+		local entity = ents.Create("singularity_ammo_box")
 		entity:SetPos(trace.HitPos)
 		entity:SetAngles(Angle(0, (entity:GetPos() - ply:GetPos()):Angle().y - 180, 0))
 		entity:Spawn()
@@ -85,7 +85,7 @@ if ( SERVER ) then
                                 Caller:GiveAmmo(giveAmmo, v:GetPrimaryAmmoType(), true)
                             end
                         end
-                        Caller:ChatNotify("Your ammunition for your weapon has been fully refilled to it's limits.")
+                        Caller:Notify("Your ammunition for your weapon has been fully refilled to it's limits.")
                         self:EmitSound("items/ammo_pickup.wav", 80)
                         self:SetBodygroup(1, 0)
                     end
