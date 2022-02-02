@@ -19,12 +19,19 @@ include( 'spawnmenu/init.lua' )
 DEFINE_BASECLASS( "gamemode_base" )
 
 function GM:PlayerLoadout(ply)
-	ply:Give("singularity_hands")
+	
 end
 
 function GM:PlayerSpawn( pl, transiton )
 
-	player_manager.SetPlayerClass( pl, "player_sandbox" )
+	ply:SetRunSpeed(200)
+	ply:SetWalkSpeed(118)
+	ply:SetSlowWalkSpeed(70)
+	ply:SetDuckSpeed(0.2)
+
+	ply:Give("singularity_hands")
+
+	player_manager.SetPlayerClass( pl, "citizen_male" )
 
 	BaseClass.PlayerSpawn( self, pl, transiton )
 

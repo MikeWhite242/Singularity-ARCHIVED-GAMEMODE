@@ -1,3 +1,16 @@
+
+concommand.Add("singularity_toggle_dev_hud", function()
+	local ply = LocalPlayer()
+
+	if ( !ply.DevHudEnabled ) then
+		SetGlobalBool("devhud", true)
+		ply.DevHudEnabled = true
+	else	
+		SetGlobalBool("devhud", false)
+		ply.DevHudEnabled = false
+	end
+end)
+
 local hide = {
 	["CHudHealth"] = true,
 	["CHudBattery"] = true,
@@ -90,14 +103,16 @@ surface.CreateFont("AmmoBigFont", {
 -- DEV HUD
 hook.Add("HUDPaint", "Test2", function()
 	local ply = LocalPlayer()
-	if (ply:Alive() and ply:IsDeveloper()) then
+	if (!ply:Alive() and ply:IsDeveloper()) then
 		return
 	end
-	draw.RoundedBox(4, 526, ScrH()-370, 160, 1.5, Color(255,255,255, 255))
-	draw.SimpleTextOutlined("SINGULARITY", "Singularity", 540, 355, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 0,0,255, 255 ))
-	draw.SimpleTextOutlined("VERSION: 0.1", "Singularity", 547, 375, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 0,0,255, 255 ))
-	draw.SimpleTextOutlined("AUTHOR: MIKE WHITE & APSYS", "Singularity", 538.5, 402, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 255,0,0, 255 ))
-	draw.SimpleTextOutlined("PREVIEW BUILD", "Singularity", 537.5, 422, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 255,0,0, 255 ))
+	if (GetGlobalBool("devhud", true) == true) then
+		draw.RoundedBox(4, 526, ScrH()-370, 160, 1.5, Color(255,255,255, 255))
+		draw.SimpleTextOutlined("SINGULARITY", "Singularity", 540, 355, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 0,0,255, 255 ))
+		draw.SimpleTextOutlined("VERSION: 0.1", "Singularity", 547, 375, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 0,0,255, 255 ))
+		draw.SimpleTextOutlined("AUTHOR: MIKE WHITE & APSYS", "Singularity", 538.5, 402, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 255,0,0, 255 ))
+		draw.SimpleTextOutlined("PREVIEW BUILD", "Singularity", 537.5, 422, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 255,0,0, 255 ))
+	end
 end)
 -- END OF DEV HUD
 hook.Add("HUDPaint", "MyAddonHUD", function()

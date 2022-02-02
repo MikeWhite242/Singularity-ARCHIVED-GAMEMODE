@@ -12,6 +12,20 @@ function PLAYER:IsDeveloper()
 	return (self:SteamID64() == "76561199172557482" or self:SteamID64() == "76561198373309941")
 end
 
+function PLAYER:IsWeaponRaised()
+	local weapon = self:GetActiveWeapon()
+
+	if IsValid(weapon) then
+		if weapon.IsAlwaysRaised or false then
+			return true
+		elseif weapon.IsAlwaysLowered then
+			return false
+		end
+	end
+
+	return self:GetNWBool("weaponRaised", true)
+end
+
 function PLAYER:IsAnAdmin()
 	return (self:GetUserGroup() == "admin")
 end
