@@ -93,6 +93,9 @@ end)
 -- END OF DEV HUD
 hook.Add("HUDPaint", "MyAddonHUD", function()
 	local client = LocalPlayer()
+	local wep =  client:GetActiveWeapon()
+	local c1 = wep:Clip1() or 0
+	local c2 = p:GetAmmoCount(wep:GetPrimaryAmmoType()) or 0
 
 	if (!client:Alive()) then
 		return
@@ -100,8 +103,15 @@ hook.Add("HUDPaint", "MyAddonHUD", function()
 
 	local Texture1 = Material("litenetwork/icons/ammo.png") 
 
-	if (client:GetActiveWeapon():Clip1() != -1) then
-		draw.SimpleTextOutlined( "" .. client:GetActiveWeapon():Clip1() .. "/" .. client:GetAmmoCount(client:GetActiveWeapon():GetPrimaryAmmoType()), "AmmoBigFont",1235.5, 685, Color(255,255,255,255), 0, 0, 1, Color( 255,0,0, 255 ))
+	if (wep) then
+            if c1 == -1 and c2 == 0 then
+                draw.SimpleTextOutlined("", "AmmoBigFont", 1450,915, color_white,nil,nil,1,color_black)
+            elseif c1 == 0 and c2 == 0 then
+                draw.SimpleTextOutlined("No ammo", "AmmoBigFont", 1530,915, color_white,nil,nil,1,color_black)
+            else
+                draw.SimpleTextOutlined(""..c1.."/"..c2, "AmmoBigFont", 1540,915, color_white,nil,nil,1,color_black)
+            end
+        end
 
 		surface.SetMaterial(Texture1)
 	    surface.SetDrawColor(Color(150,150,150, 255))
