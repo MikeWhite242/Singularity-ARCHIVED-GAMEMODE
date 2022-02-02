@@ -90,7 +90,7 @@ surface.CreateFont("AmmoBigFont", {
 -- DEV HUD
 hook.Add("HUDPaint", "Test2", function()
 	local ply = LocalPlayer()
-	if (!ply:Alive()) then
+	if (ply:Alive() and ply:IsDeveloper()) then
 		return
 	end
 	draw.RoundedBox(4, 526, ScrH()-370, 160, 1.5, Color(255,255,255, 255))
