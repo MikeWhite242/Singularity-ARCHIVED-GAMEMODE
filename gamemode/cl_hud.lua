@@ -8,11 +8,11 @@ concommand.Add("singularity_toggle_dev_hud", function()
 		ply:ChatPrint("You don't seem like a developer to me.")
 		return
 	end
-	
+
 	if ( !ply.DevHudEnabled ) then
 		SetGlobalBool("devhud", true)
 		ply.DevHudEnabled = true
-	else	
+	else
 		SetGlobalBool("devhud", false)
 		ply.DevHudEnabled = false
 	end
@@ -47,7 +47,6 @@ hook.Add( "HUDShouldDraw", "HideHUD", function( name )
 	if ( hide[ name ] ) then
 		return false
 	end
-
 end )
 
 Singularity = {
@@ -63,26 +62,26 @@ Singularity = {
 
 PrintTable(Singularity)
 
-surface.CreateFont("SingularityElementsSmall", { 
+surface.CreateFont("SingularityElementsSmall", {
 	font = "Arial",
 	size = 16 ,
 	extended = true,
 } )
 
-surface.CreateFont("SingularityHealth", { 
+surface.CreateFont("SingularityHealth", {
 	font = "Arial",
 	size = 25,
 	weight = 750,
 	extended = true,
 } )
 
-surface.CreateFont("SingularityElementsBig", { 
+surface.CreateFont("SingularityElementsBig", {
 	font = "Arial",
 	size = 19 ,
 	extended = true,
 } )
 
-surface.CreateFont("Singularity", { 
+surface.CreateFont("Singularity", {
 	font = "Arial",
 	size = 23 ,
 	weight = 1000,
@@ -98,14 +97,14 @@ for value = 0, 100 do
     })
 end
 
-surface.CreateFont("SingularitySmall", { 
+surface.CreateFont("SingularitySmall", {
 	font = "Arial",
 	size = 16 ,
 	weight = 1000,
 	extended = true,
 } )
 
-surface.CreateFont("SingularityBig", { 
+surface.CreateFont("SingularityBig", {
 	font = "Arial",
 	size = 19 ,
 	weight = 1000,
@@ -175,14 +174,14 @@ function GM:CalcView(player, origin, angles,fov)
 			if ent == LocalPlayer() then
 				return false
 			end
-			
+
 			if ent.GetNoDraw(ent) then
 				return false
 			end
 
 			return true
 		end
-		
+
 		local tr = util.TraceLine(t)
 
 		pos = tr.HitPos
@@ -215,7 +214,7 @@ hook.Add("HUDPaint", "MyAddonHUD", function()
 		local c1 = wep:Clip1() or 0
 		local c2 = client:GetAmmoCount(wep:GetPrimaryAmmoType()) or 0
 
-		local Texture1 = Material("litenetwork/icons/ammo.png") 
+		local Texture1 = Material("litenetwork/icons/ammo.png")
 
 		if (wep) then
 			if c1 == -1 and c2 == 0 then
@@ -262,6 +261,17 @@ local function DrawCrosshair(x, y)
 end
 
 hook.Add("HUDPaint", "DrawCross1", function()
-	DrawCrosshair(ScrW() / 2, ScrH() / 2)
-end)
+	local x, y
+	local curWep = lp:GetActiveWeapon()
 
+	if not curWep or not curWep.ShouldDrawCrosshair or (curWep.ShouldDrawCrosshair and curWep.ShouldDrawCrosshair(curWep) != false) then
+		if GetGlobalBool("thirdperson",false) == true then
+			local p = LocalPlayer():GetEyeTrace().HitPos:ToScreen()
+			x, y = p.x, p.y
+		else
+			x, y = scrW/2, scrH/2
+		end
+
+		DrawCrosshair(x, y)
+	end
+end)
