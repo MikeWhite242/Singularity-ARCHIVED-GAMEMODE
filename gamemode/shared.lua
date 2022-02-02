@@ -5,7 +5,7 @@ include( "save_load.lua" )
 include( "player_class/player_sandbox.lua" )
 include( "drive/drive_sandbox.lua" )
 include( "editor_player.lua" )
-include( "meta" )
+include( "meta/sh_player.lua" )
 
 
 DEFINE_BASECLASS( "gamemode_base" )

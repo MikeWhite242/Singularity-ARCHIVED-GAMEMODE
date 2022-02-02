@@ -5,11 +5,11 @@
 local PLAYER = FindMetaTable("Player")
 
 function PLAYER:IsOwner()
-  	return ( self:SteamID() == "STEAM_0:0:606145877" )
+  	return ( self:SteamID64() == "76561199172557482" )
 end
 
 function PLAYER:IsDeveloper()
-	return (self:SteamID() == "STEAM_0:0:606145877" or self:SteamID() == "STEAM_0:1:206522106")
+	return (self:SteamID64() == "76561199172557482" or self:SteamID64() == "76561198373309941")
 end
 
 function PLAYER:IsAnAdmin()
