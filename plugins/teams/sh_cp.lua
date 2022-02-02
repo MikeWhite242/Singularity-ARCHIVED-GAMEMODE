@@ -1,0 +1,1 @@
+TEAM_CP = singularity.Teams.Define(3, "Civil Protection", Color(32,138,187))

@@ -27,6 +27,23 @@ end
 
 if ( SERVER ) then
 	util.AddNetworkString("singularityNotify")
+
+	function PLAYER:SetRPName(name)
+		self:SetNWString("RPName",name)
+	end
+	
+	function PLAYER:EditRPName(name,no_sync)
+		self:SetRPName(name)
+		if not no_sync then
+			sql.Query("UPDATE landis_user SET rpname = " .. sql.SQLStr(name) .. " WHERE steamid = " .. sql.SQLStr(self:SteamID64()))
+		end
+	end
+	
+	function PLAYER:GetSyncRPName()
+		local T = sql.Query("SELECT rpname FROM landis_user WHERE steamid = " .. sql.SQLStr(tostring(self:SteamID64())))
+		return T[1].rpname
+	end
+	
 	local PLAYER = FindMetaTable("Player")
 
 	function PLAYER:NearEntity(entity, radius)

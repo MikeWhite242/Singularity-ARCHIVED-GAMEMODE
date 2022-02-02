@@ -14,10 +14,10 @@ surface.CreateFont("notifyText", {
 --[[]
 Call order:
 create vgui
-set duration,
+set duration,--hehe
 set message
 ]]
-
+--LOL
 function PANEL:SetMessage(text)
 
 	local font = "<font=notifyText>"
