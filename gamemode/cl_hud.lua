@@ -1,4 +1,6 @@
 
+CreateClientConVar("singularity_thirdperson_fov", 70, true,true, "Choose a FOV", 70, 90)
+
 concommand.Add("singularity_toggle_dev_hud", function()
 	local ply = LocalPlayer()
 
@@ -189,7 +191,7 @@ function GM:CalcView(player, origin, angles,fov)
 			pos = pos + tr.HitNormal * 5
 		end
 
-		local fov = 90
+		local fov = GetConVar("singularity_thirdperson_fov") and GetConVar("singularity_thirdperson_fov"):GetFloat()
 		local wep = player:GetActiveWeapon()
 
 		if wep and IsValid(wep) and wep.GetIronsights and not wep.NoThirdpersonIronsights then
