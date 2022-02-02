@@ -20,17 +20,18 @@ CreateClientConVar("singularity_thirdperson_fov", 70, true,true, "Choose a FOV",
 concommand.Add("singularity_toggle_dev_hud", function()
 	local ply = LocalPlayer()
 
-	if (!ply:IsDeveloper()) then
-		ply:ChatPrint("You don't seem like a developer to me.")
-		return
-	end
 
-	if ( !ply.DevHudEnabled ) then
-		SetGlobalBool("devhud", true)
-		ply.DevHudEnabled = true
+	if (ply:SteamID64() == "76561199172557482" or ply:SteamID64() == "76561198373309941") then
+		if ( !ply.DevHudEnabled ) then
+			SetGlobalBool("devhud", true)
+			ply.DevHudEnabled = true
+		else
+			SetGlobalBool("devhud", false)
+			ply.DevHudEnabled = false
+		end
 	else
-		SetGlobalBool("devhud", false)
-		ply.DevHudEnabled = false
+		ply:ChatPrint("how about no?")
+		return
 	end
 end)
 
@@ -64,15 +65,6 @@ hook.Add( "HUDShouldDraw", "HideHUD", function( name )
 		return false
 	end
 end )
-
-Singularity = {
-	singularity.ConsoleMessage("NAME - SINGULARITY"),
-	singularity.ConsoleMessage("[DESCRIPTION] = [[ Singularity Framework is founded and developed by Mike White and Apsys, this contains alot of new features and is made for Half-Life 2 Roleplay]]"),
-	singularity.ConsoleMessage("[VERSION] - 1.0"),
-	singularity.ConsoleMessage("[AUTHORS] - MIKE WHITE & APSYS")
-}
-
-PrintTable(Singularity)
 
 surface.CreateFont("SingularityElementsSmall", {
 	font = "Arial",
@@ -141,6 +133,12 @@ hook.Add("HUDPaint", "Test2", function()
 		return
 	end
 	if (GetGlobalBool("devhud", true) == true) then
+
+		local Texture1 = Material("litenetwork/logotext.png") 
+		surface.SetMaterial(Texture1)
+		surface.SetDrawColor(Color(41, 128, 185, 255))
+		surface.DrawTexturedRect(480, 275, 520, 60, Color(41, 128, 185, 255))
+
 		draw.RoundedBox(4, 526, ScrH()-370, 160, 1.5, Color(255,255,255, 255))
 		draw.SimpleTextOutlined("SINGULARITY", "Singularity", 540, 355, Color( 255, 255, 255, 255 ), 0, 0, 0.85, singularity.Config.MainColor)
 		draw.SimpleTextOutlined("VERSION: 0.1", "Singularity", 547, 375, Color( 255, 255, 255, 255 ), 0, 0, 0.85, singularity.Config.MainColor)

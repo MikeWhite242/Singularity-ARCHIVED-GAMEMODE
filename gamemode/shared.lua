@@ -1,15 +1,5 @@
 
-include( "player_extension.lua" )
-include( "persistence.lua" )
-include( "save_load.lua" )
-include( "player_class/player_sandbox.lua" )
-include( "drive/drive_sandbox.lua" )
-include( "editor_player.lua" )
-include( "meta/sh_player.lua" )
-
-
-DEFINE_BASECLASS( "gamemode_base" )
-
+DeriveGamemode("sandbox")
 
 GM.Name 	= "Singularity"
 GM.Author 	= "Mike White & Apsys"
@@ -18,6 +8,10 @@ GM.Website 	= "None"
 
 singularity = singularity or {}
 singularity.lib = singularity.lib or {}
+
+singularity.__VERSION = "1.0"
+singularity.__DISPLAY = "Singularity Framework"
+singularity.__XTNOTES = "PREVIEW BUILD"
 
 singularity.Config =  {}
 singularity.Config.MainColor        = Color( 73, 123, 240)
@@ -149,10 +143,14 @@ end
 
 if SERVER then
 	MsgC(Color(10,132,255),"[SINGULARITY] loading plugins...\n")
-	singularity.includeDir("landis/plugins")
+	singularity.includeDir("singularity/plugins")
+	MsgC(Color(10,132,255),"[SINGULARITY] loading metas...\n")
+	singularity.includeDir("singularity/meta")
 end
 
 if CLIENT then 
 	MsgC(Color(10,132,255),"[SINGULARITY] loading plugins...\n")
 	singularity.includeDir("singularity/plugins")
+	MsgC(Color(10,132,255),"[SINGULARITY] loading metas...\n")
+	singularity.includeDir("singularity/meta")
 end
