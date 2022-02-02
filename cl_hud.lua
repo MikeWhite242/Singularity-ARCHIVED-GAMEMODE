@@ -105,11 +105,11 @@ hook.Add("HUDPaint", "MyAddonHUD", function()
 
 	if (wep) then
             if c1 == -1 and c2 == 0 then
-                draw.SimpleTextOutlined("", "AmmoBigFont", 1450,915, color_white,nil,nil,1,color_black)
+                draw.SimpleTextOutlined("", "AmmoBigFont", 1235.5, 685, color_white,nil,nil,1,color_black)
             elseif c1 == 0 and c2 == 0 then
-                draw.SimpleTextOutlined("No ammo", "AmmoBigFont", 1530,915, color_white,nil,nil,1,color_black)
+                draw.SimpleTextOutlined("No ammo", "AmmoBigFont", 1235.5, 685, color_white,nil,nil,1,color_black)
             else
-                draw.SimpleTextOutlined(""..c1.."/"..c2, "AmmoBigFont", 1540,915, color_white,nil,nil,1,color_black)
+                draw.SimpleTextOutlined(""..c1.."/"..c2, "AmmoBigFont", 1235.5, 685, color_white,nil,nil,1,color_black)
             end
         end
 
