@@ -103,29 +103,27 @@ end)
 hook.Add("HUDPaint", "MyAddonHUD", function()
 	local client = LocalPlayer()
 	local wep =  client:GetActiveWeapon()
-	local c1 = wep:Clip1() or 0
-	local c2 = client:GetAmmoCount(wep:GetPrimaryAmmoType()) or 0
+	if (client:Alive() and IsValid(wep)) then
+		local c1 = wep:Clip1() or 0
+		local c2 = client:GetAmmoCount(wep:GetPrimaryAmmoType()) or 0
 
-	if (!client:Alive()) then
-		return
-	end
+		local Texture1 = Material("litenetwork/icons/ammo.png") 
 
-	local Texture1 = Material("litenetwork/icons/ammo.png") 
+		if (wep) then
+			if c1 == -1 and c2 == 0 then
+				draw.SimpleTextOutlined("", "AmmoBigFont", 1235.5, 685, color_white,nil,nil,1,color_black)
+			elseif c1 == 0 and c2 == 0 then
+				draw.SimpleTextOutlined("0", "AmmoBigFont", 1235.5, 685, color_white,nil,nil,1,color_black)
+			else
+				draw.SimpleTextOutlined(""..c1.."/"..c2, "AmmoBigFont", 1235.5, 685, color_white,nil,nil,1,color_black)
+			end
 
-	if (wep) then
-		if c1 == -1 and c2 == 0 then
-			draw.SimpleTextOutlined("", "AmmoBigFont", 1235.5, 685, color_white,nil,nil,1,color_black)
-		elseif c1 == 0 and c2 == 0 then
-			draw.SimpleTextOutlined("0", "AmmoBigFont", 1235.5, 685, color_white,nil,nil,1,color_black)
-		else
-			draw.SimpleTextOutlined(""..c1.."/"..c2, "AmmoBigFont", 1235.5, 685, color_white,nil,nil,1,color_black)
+			surface.SetMaterial(Texture1)
+			surface.SetDrawColor(Color(150,150,150, 255))
+			surface.DrawTexturedRect(ScrW()-214, ScrH()-103, 80, 80, Color(255,255,255, 255))
+
+			draw.RoundedBox(4, ScrW()-226, ScrH()-113, 220, 100, Color(60,60,60, 25))
 		end
-
-		surface.SetMaterial(Texture1)
-	    surface.SetDrawColor(Color(150,150,150, 255))
-	    surface.DrawTexturedRect(ScrW()-214, ScrH()-103, 80, 80, Color(255,255,255, 255))
-
-		draw.RoundedBox(4, ScrW()-226, ScrH()-113, 220, 100, Color(60,60,60, 25))
 	end
 end)
 
