@@ -1,3 +1,5 @@
+
+
 AddCSLuaFile( 'cl_hud.lua' )
 AddCSLuaFile( "cl_hints.lua" )
 AddCSLuaFile( "cl_init.lua" )
@@ -11,15 +13,26 @@ AddCSLuaFile( "save_load.lua" )
 AddCSLuaFile( "shared.lua" )
 AddCSLuaFile( "gui/IconEditor.lua" )
 
-include( 'shared.lua' )
-include( 'commands.lua' )
-include( 'player.lua' )
-include( 'spawnmenu/init.lua' )
+include( "shared.lua" )
+include( "commands.lua" )
+include( "player.lua" )
+include( "spawnmenu/init.lua" )
 
 DEFINE_BASECLASS( "gamemode_base" )
 
-function GM:PlayerLoadout(ply)
-	
+function GM:PlayerLoadout(pl)
+	pl:SetRunSpeed(200)
+	pl:SetWalkSpeed(118)
+	pl:SetSlowWalkSpeed(70)
+	pl:SetDuckSpeed(0.2)
+
+	pl:Give("singularity_hands")
+	pl:Give("weapon_physgun")
+	pl:Give("gmod_tool")
+end
+
+function GM:OnReloaded()
+	singularity.ConsoleMessage("Gamemode Reloaded (SERVERSIDE)")
 end
 
 function GM:PlayerSpawn(pl, transition)
@@ -28,8 +41,6 @@ function GM:PlayerSpawn(pl, transition)
 	pl:SetWalkSpeed(118)
 	pl:SetSlowWalkSpeed(70)
 	pl:SetDuckSpeed(0.2)
-
-	pl:Give("singularity_hands")
 
 	player_manager.SetPlayerClass( pl, "player_sandbox" )
 

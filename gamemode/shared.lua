@@ -6,7 +6,6 @@ include( "player_class/player_sandbox.lua" )
 include( "drive/drive_sandbox.lua" )
 include( "editor_player.lua" )
 include( "meta/sh_player.lua" )
-include( "sh_anims.lua" )
 
 
 DEFINE_BASECLASS( "gamemode_base" )
@@ -20,49 +19,59 @@ GM.Website 	= "None"
 singularity = singularity or {}
 singularity.lib = singularity.lib or {}
 
-cleanup.Register( "props" )
-cleanup.Register( "ragdolls" )
-cleanup.Register( "effects" )
-cleanup.Register( "npcs" )
-cleanup.Register( "constraints" )
-cleanup.Register( "ropeconstraints" )
-cleanup.Register( "sents" )
-cleanup.Register( "vehicles" )
+singularity.Config =  {}
+singularity.Config.MainColor        = Color( 73, 123, 240)
+singularity.Config.DefaultTextColor = Color( 245, 245, 245 )
+singularity.Config.BGColorDark      = Color( 44,  44,  46  )
+singularity.Config.BGColorLight     = Color( 229, 229, 234  )
+singularity.Config.ConsolePrefix    = "[Singularity]"
+singularity.Config.VoiceRange       = 600
 
-
-local physgun_limited = CreateConVar( "physgun_limited", "0", FCVAR_REPLICATED )
-
---[[---------------------------------------------------------
-   Name: gamemode:CanTool( ply, trace, mode, tool, button )
-   Return true if the player is allowed to use this tool
------------------------------------------------------------]]
-function GM:CanTool( ply, trace, mode, tool, button )
-
-	-- The jeep spazzes out when applying something
-	-- todo: Find out what it's reacting badly to and change it in _physprops
-	if ( mode == "physprop" && trace.Entity:IsValid() && trace.Entity:GetClass() == "prop_vehicle_jeep" ) then
-		return false
+function singularity.ConsoleMessage(...)
+	local mColor = singularity.Config.MainColor
+	local prefix = singularity.Config.ConsolePrefix
+	local textCo = singularity.Config.DefaultTextColor
+	if CLIENT then
+		return MsgC(mColor,prefix," ",textCo,...,"\n") -- \n to prevent same line console messages
 	end
+	return MsgC(mColor,prefix," ",textCo,...,"\n")
+end
 
-	-- If we have a toolsallowed table, check to make sure the toolmode is in it
-	if ( trace.Entity.m_tblToolsAllowed ) then
-
-		local vFound = false
-		for k, v in pairs( trace.Entity.m_tblToolsAllowed ) do
-			if ( mode == v ) then vFound = true end
-		end
-
-		if ( !vFound ) then return false end
-
+function GM:PlayerCanSeePlayersChat( _, __, listener, talker )
+	if not talker:Alive() then return false end
+	if listener:GetPos():DistToSqr( talker:GetPos() ) < ((singularity.Config.VoiceRange*singularity.Config.VoiceRange) or 600*600) then
+		return true,true
 	end
+end
 
-	-- Give the entity a chance to decide
-	if ( trace.Entity.CanTool ) then
-		return trace.Entity:CanTool( ply, trace, mode, tool, button )
+function GM:PlayerCanHearPlayersVoice( listener, talker )
+	if not talker:Alive() then return false end
+	if listener:GetPos():DistToSqr( talker:GetPos() ) < ((singularity.Config.VoiceRange*singularity.Config.VoiceRange) or 600*600) then
+		return true,true
 	end
+end
 
-	return true
+function singularity.Warn(...)
+	local singularity = landis.Config.MainColor
+	local singularity = landis.Config.ConsolePrefix
+	local singularity = landis.Config.DefaultTextColor
+	if CLIENT then
+		return MsgC(mColor,prefix,Color(255,149,0),"[Warn] ",textCo,...,"\n") -- \n to prevent same line console messages
+	end
+	return MsgC(mColor,prefix,Color(255,149,0),"[Warn] ",textCo,...,"\n")
+end
 
+function singularity.Error(...)
+	local mColor = singularity.Config.MainColor
+	local prefix = singularity.Config.ConsolePrefix
+	local textCo = singularity.Config.DefaultTextColor
+	if CLIENT then
+		return MsgC(mColor,prefix,Color(255,149,0),"[Error] ",textCo,...,"\n") -- \n to prevent same line console messages
+	end
+	MsgC(mColor,prefix,Color(255,59,48),"[Error] ",textCo,...,"\n")
+	print("======[STACK TRACEBACK]=====")
+	debug.Trace()
+	print("======[ENDOF TRACEBACK]=====")
 end
 
 function singularity.includeDir( scanDirectory, core )
@@ -138,247 +147,12 @@ function singularity.includeDir( scanDirectory, core )
 	end
 end
 
-
---[[---------------------------------------------------------
-   Name: gamemode:GravGunPunt( )
-   Desc: We're about to punt an entity (primary fire).
-		 Return true if we're allowed to.
------------------------------------------------------------]]
-function GM:GravGunPunt( ply, ent )
-
-	if ( ent:IsValid() && ent.GravGunPunt ) then
-		return ent:GravGunPunt( ply )
-	end
-
-	return BaseClass.GravGunPunt( self, ply, ent )
-
+if SERVER then
+	MsgC(Color(10,132,255),"[SINGULARITY] loading plugins...\n")
+	singularity.includeDir("landis/plugins")
 end
 
---[[---------------------------------------------------------
-   Name: gamemode:GravGunPickupAllowed( )
-   Desc: Return true if we're allowed to pickup entity
------------------------------------------------------------]]
-function GM:GravGunPickupAllowed( ply, ent )
-
-	if ( ent:IsValid() && ent.GravGunPickupAllowed ) then
-		return ent:GravGunPickupAllowed( ply )
-	end
-
-	return BaseClass.GravGunPickupAllowed( self, ply, ent )
-
-end
-
-
---[[---------------------------------------------------------
-   Name: gamemode:PhysgunPickup( )
-   Desc: Return true if player can pickup entity
------------------------------------------------------------]]
-function GM:PhysgunPickup( ply, ent )
-
-	-- Don't pick up persistent props
-	if ( ent:GetPersistent() ) then return false end
-
-	if ( ent:IsValid() && ent.PhysgunPickup ) then
-		return ent:PhysgunPickup( ply )
-	end
-
-	-- Some entities specifically forbid physgun interaction
-	if ( ent.PhysgunDisabled ) then return false end
-
-	local EntClass = ent:GetClass()
-
-	-- Never pick up players
-	if ( EntClass == "player" ) then return false end
-
-	if ( physgun_limited:GetBool() ) then
-
-		if ( string.find( EntClass, "prop_dynamic" ) ) then return false end
-		if ( string.find( EntClass, "prop_door" ) ) then return false end
-
-		-- Don't move physboxes if the mapper logic says no
-		if ( EntClass == "func_physbox" && ent:HasSpawnFlags( SF_PHYSBOX_MOTIONDISABLED ) ) then return false  end
-
-		-- If the physics object is frozen by the mapper, don't allow us to move it.
-		if ( string.find( EntClass, "prop_" ) && ( ent:HasSpawnFlags( SF_PHYSPROP_MOTIONDISABLED ) || ent:HasSpawnFlags( SF_PHYSPROP_PREVENT_PICKUP ) ) ) then return false end
-
-		-- Allow physboxes, but get rid of all other func_'s (ladder etc)
-		if ( EntClass != "func_physbox" && string.find( EntClass, "func_" ) ) then return false end
-
-
-	end
-
-	if ( SERVER ) then
-
-		ply:SendHint( "PhysgunFreeze", 2 )
-		ply:SendHint( "PhysgunUse", 8 )
-
-	end
-
-	return true
-
-end
-
-
---[[---------------------------------------------------------
-   Name: gamemode:EntityKeyValue( ent, key, value )
-   Desc: Called when an entity has a keyvalue set
-	      Returning a string it will override the value
------------------------------------------------------------]]
-function GM:EntityKeyValue( ent, key, value )
-
-	-- Physgun not allowed on this prop..
-	if ( key == "gmod_allowphysgun" && value == '0' ) then
-		ent.PhysgunDisabled = true
-	end
-
-	-- Prop has a list of tools that are allowed on it.
-	if ( key == "gmod_allowtools" ) then
-		ent.m_tblToolsAllowed = string.Explode( " ", value )
-	end
-
-end
-
---[[---------------------------------------------------------
-   Name: gamemode:PlayerNoClip( player, bool )
-   Desc: Player pressed the noclip key, return true if
-		  the player is allowed to noclip, false to block
------------------------------------------------------------]]
-function GM:PlayerNoClip( pl, on )
-
-	-- Don't allow if player is in vehicle
-	if ( !IsValid( pl ) || pl:InVehicle() || !pl:Alive() ) then return false end
-
-	-- Always allow to turn off noclip, and in single player
-	if ( !on || game.SinglePlayer() ) then return true end
-
-	return GetConVarNumber( "sbox_noclip" ) > 0
-
-end
-
---[[---------------------------------------------------------
-   Name: gamemode:CanProperty( pl, property, ent )
-   Desc: Can the player do this property, to this entity?
------------------------------------------------------------]]
-function GM:CanProperty( pl, property, ent )
-
-	--
-	-- Always a chance some bastard got through
-	--
-	if ( !IsValid( ent ) ) then return false end
-
-
-	--
-	-- If we have a toolsallowed table, check to make sure the toolmode is in it
-	-- This is used by things like map entities
-	--
-	if ( ent.m_tblToolsAllowed ) then
-
-		local vFound = false
-		for k, v in pairs( ent.m_tblToolsAllowed ) do
-			if ( property == v ) then vFound = true end
-		end
-
-		if ( !vFound ) then return false end
-
-	end
-
-	--
-	-- Who can who bone manipulate?
-	--
-	if ( property == "bonemanipulate" ) then
-
-		if ( game.SinglePlayer() ) then return true end
-
-		if ( ent:IsNPC() ) then return GetConVarNumber( "sbox_bonemanip_npc" ) != 0 end
-		if ( ent:IsPlayer() ) then return GetConVarNumber( "sbox_bonemanip_player" ) != 0 end
-
-		return GetConVarNumber( "sbox_bonemanip_misc" ) != 0
-
-	end
-
-	--
-	-- Weapons can only be property'd if nobody is holding them
-	--
-	if ( ent:IsWeapon() and IsValid( ent:GetOwner() ) ) then
-		return false
-	end
-
-	-- Give the entity a chance to decide
-	if ( ent.CanProperty ) then
-		return ent:CanProperty( pl, property )
-	end
-
-	return true
-
-end
-
---[[---------------------------------------------------------
-   Name: gamemode:CanDrive( pl, ent )
-   Desc: Return true to let the entity drive.
------------------------------------------------------------]]
-function GM:CanDrive( pl, ent )
-
-	local classname = ent:GetClass();
-
-	--
-	-- Only let physics based NPCs be driven for now
-	--
-	if ( ent:IsNPC() ) then
-
-		if ( classname == "npc_cscanner" ) then return true end
-		if ( classname == "npc_clawscanner" ) then return true end
-		if ( classname == "npc_manhack" ) then return true end
-		if ( classname == "npc_turret_floor" ) then return true end
-		if ( classname == "npc_rollermine" ) then return true end
-
-		return false
-
-	end
-
-	if ( classname == "prop_dynamic" ) then return false end
-	if ( classname == "prop_door" ) then return false end
-
-	--
-	-- I'm guessing we'll find more things we don't want the player to fly around during development
-	--
-
-	return true
-
-end
-
-
---[[---------------------------------------------------------
-	To update the player's animation during a drive
------------------------------------------------------------]]
-function GM:PlayerDriveAnimate( ply )
-
-	local driving = ply:GetDrivingEntity()
-	if ( !IsValid( driving ) ) then return end
-
-	ply:SetPlaybackRate( 1 )
-	ply:ResetSequence( ply:SelectWeightedSequence( ACT_HL2MP_IDLE_MAGIC ) )
-
-	--
-	-- Work out the direction from the player to the entity, and set parameters
-	--
-	local DirToEnt = driving:GetPos() - ( ply:GetPos() + Vector( 0, 0, 50 ) )
-	local AimAng = DirToEnt:Angle()
-
-	if ( AimAng.p > 180 ) then
-		AimAng.p = AimAng.p - 360
-	end
-
-	ply:SetPoseParameter( "aim_yaw",		0 )
-	ply:SetPoseParameter( "aim_pitch",		AimAng.p )
-	ply:SetPoseParameter( "move_x",			0 )
-	ply:SetPoseParameter( "move_y",			0 )
-	ply:SetPoseParameter( "move_yaw",		0 )
-	ply:SetPoseParameter( "move_scale",		0 )
-
-	AimAng.p = 0;
-	AimAng.r = 0;
-
-	ply:SetRenderAngles( AimAng )
-	ply:SetEyeTarget( driving:GetPos() )
-
+if CLIENT then 
+	MsgC(Color(10,132,255),"[SINGULARITY] loading plugins...\n")
+	singularity.includeDir("singularity/plugins")
 end

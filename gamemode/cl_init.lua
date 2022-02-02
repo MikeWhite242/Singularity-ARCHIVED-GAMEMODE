@@ -11,8 +11,9 @@ include( 'gui/spawnicon.lua' )
 
 DEFINE_BASECLASS( "gamemode_base" )
 
-function GM:Initialize()
 
+function GM:OnReloaded()
+	singularity.ConsoleMessage("Gamemode Reloaded (CLIENTSIDE)")
 end
 
 function GM:LimitHit( name )
@@ -99,9 +100,6 @@ local PhysgunHalos = {}
 	Desc: Return false to override completely
 -----------------------------------------------------------]]
 function GM:DrawPhysgunBeam( ply, weapon, bOn, target, boneid, pos )
-
-	if ( physgun_halo:GetInt() == 0 ) then return true end
-
 	if ( IsValid( target ) ) then
 		PhysgunHalos[ ply ] = target
 	end

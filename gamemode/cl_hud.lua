@@ -1,4 +1,20 @@
 
+-- Credit to vin --
+local function DrawEntInfo(target, alpha)
+	local pos = target.LocalToWorld(target, target:OBBCenter()):ToScreen()
+	local scrW = ScrW()
+	local scrH = ScrH()
+	local hudName = target.HUDName
+	local hudDesc = target.HUDDesc
+	local hudCol = target.HUDColour or impulse.Config.InteractColour
+
+	draw.DrawText(hudName, "SingularityFont19", pos.x, pos.y, ColorAlpha(hudCol, alpha), 1)
+
+	if hudDesc then
+		draw.DrawText(hudDesc, "SingularityFont16", pos.x, pos.y + 20, ColorAlpha(color_white, alpha), 1)
+	end
+end
+
 CreateClientConVar("singularity_thirdperson_fov", 70, true,true, "Choose a FOV", 70, 90)
 
 concommand.Add("singularity_toggle_dev_hud", function()
@@ -50,14 +66,10 @@ hook.Add( "HUDShouldDraw", "HideHUD", function( name )
 end )
 
 Singularity = {
-
-	["Description"] = [[ Singularity Framework is founded and developed by Mike White,
-			 this contains alot of new features, this framework is made
-			 for Half Life 2 Semi Serious Roleplay.
-	]],
-	["Name"] = "Singularity Framework",
-	["Author"] = "Mike White & Apsys",
-	["Version"] = "0.1",
+	singularity.ConsoleMessage("NAME - SINGULARITY"),
+	singularity.ConsoleMessage("[DESCRIPTION] = [[ Singularity Framework is founded and developed by Mike White and Apsys, this contains alot of new features and is made for Half-Life 2 Roleplay]]"),
+	singularity.ConsoleMessage("[VERSION] - 1.0"),
+	singularity.ConsoleMessage("[AUTHORS] - MIKE WHITE & APSYS")
 }
 
 PrintTable(Singularity)
@@ -121,15 +133,24 @@ surface.CreateFont("AmmoBigFont", {
 -- DEV HUD
 hook.Add("HUDPaint", "Test2", function()
 	local ply = LocalPlayer()
+	local p = LocalPlayer()
+	local sw, sh = ScrW(), ScrH()
+	local trace = p:GetEyeTraceNoCursor()
+	local entTrace = trace.Entity
 	if (!ply:Alive() and ply:IsDeveloper()) then
 		return
 	end
 	if (GetGlobalBool("devhud", true) == true) then
 		draw.RoundedBox(4, 526, ScrH()-370, 160, 1.5, Color(255,255,255, 255))
-		draw.SimpleTextOutlined("SINGULARITY", "Singularity", 540, 355, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 0,0,255, 255 ))
-		draw.SimpleTextOutlined("VERSION: 0.1", "Singularity", 547, 375, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 0,0,255, 255 ))
+		draw.SimpleTextOutlined("SINGULARITY", "Singularity", 540, 355, Color( 255, 255, 255, 255 ), 0, 0, 0.85, singularity.Config.MainColor)
+		draw.SimpleTextOutlined("VERSION: 0.1", "Singularity", 547, 375, Color( 255, 255, 255, 255 ), 0, 0, 0.85, singularity.Config.MainColor)
 		draw.SimpleTextOutlined("AUTHOR: MIKE WHITE & APSYS", "Singularity", 538.5, 402, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 255,0,0, 255 ))
 		draw.SimpleTextOutlined("PREVIEW BUILD", "Singularity", 537.5, 422, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 255,0,0, 255 ))
+		if IsValid(entTrace) then
+			if (CLIENT) then 
+				draw.SimpleText(""..string.upper(entTrace:GetClass() .."\n/\n" .. entTrace:GetModel()), "Singularity", sw - 1050, sh - 280, singularity.Config.MainColor)
+			end
+		end
 	end
 end)
 
@@ -261,6 +282,7 @@ local function DrawCrosshair(x, y)
 end
 
 hook.Add("HUDPaint", "DrawCross1", function()
+	local lp = LocalPlayer()
 	local x, y
 	local curWep = lp:GetActiveWeapon()
 
@@ -269,9 +291,70 @@ hook.Add("HUDPaint", "DrawCross1", function()
 			local p = LocalPlayer():GetEyeTrace().HitPos:ToScreen()
 			x, y = p.x, p.y
 		else
-			x, y = scrW/2, scrH/2
+			x, y = ScrW()/2, ScrH()/2
 		end
 
 		DrawCrosshair(x, y)
 	end
+end)
+
+-- Credit to vin --
+local nextOverheadCheck = 0
+local lastEnt
+local trace = {}
+local approach = math.Approach
+local letterboxFde = 0
+local textFde = 0
+local holdTime
+overheadEntCache = {}
+hook.Add("HUDPaintBackground", "Mikeistorturingme", function()
+
+	local lp = LocalPlayer()
+	local realTime = RealTime()
+	local frameTime = FrameTime()
+
+	if nextOverheadCheck < realTime then
+		nextOverheadCheck = realTime + 0.5
+		
+		trace.start = lp.GetShootPos(lp)
+		trace.endpos = trace.start + lp.GetAimVector(lp) * 300
+		trace.filter = lp
+		trace.mins = Vector(-4, -4, -4)
+		trace.maxs = Vector(4, 4, 4)
+		trace.mask = MASK_SHOT_HULL
+
+		lastEnt = util.TraceHull(trace).Entity
+
+		if IsValid(lastEnt) then
+			overheadEntCache[lastEnt] = true
+		end
+	end
+
+	for entTarg, shouldDraw in pairs(overheadEntCache) do
+		if IsValid(entTarg) then
+			local goal = shouldDraw and 255 or 0
+			local alpha = approach(entTarg.overheadAlpha or 0, goal, frameTime * 1000)
+
+			if lastEnt != entTarg then
+				overheadEntCache[entTarg] = false
+			end
+
+			if alpha > 0 then
+				if not entTarg:GetNoDraw() then
+					if entTarg.HUDName then
+						DrawEntInfo(entTarg, alpha)
+					end
+				end
+			end
+
+			entTarg.overheadAlpha = alpha
+
+			if alpha == 0 and goal == 0 then
+				overheadEntCache[entTarg] = nil
+			end
+		else
+			overheadEntCache[entTarg] = nil
+		end
+	end
+
 end)
