@@ -18,6 +18,10 @@ include( 'spawnmenu/init.lua' )
 
 DEFINE_BASECLASS( "gamemode_base" )
 
+function GM:PlayerLoadout(ply)
+	ply:Give("singularity_hands")
+end
+
 function GM:PlayerSpawn( pl, transiton )
 
 	player_manager.SetPlayerClass( pl, "player_sandbox" )
