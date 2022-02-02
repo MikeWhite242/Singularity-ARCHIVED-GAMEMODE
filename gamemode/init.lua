@@ -22,7 +22,7 @@ function GM:PlayerLoadout(ply)
 	
 end
 
-function GM:PlayerSpawn( pl, transiton )
+function GM:PlayerSpawn( ply, transiton )
 
 	ply:SetRunSpeed(200)
 	ply:SetWalkSpeed(118)
