@@ -12,6 +12,9 @@ function PLAYER:IsDeveloper()
 	return (self:SteamID64() == "76561199172557482" or self:SteamID64() == "76561198373309941")
 end
 
+function PLAYER:GetRPName()
+	return (self:GetNWString("RPName", self:Nick()))
+end
 
 function PLAYER:IsAnAdmin()
 	return (self:GetUserGroup() == "admin")

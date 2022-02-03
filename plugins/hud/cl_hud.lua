@@ -134,7 +134,7 @@ hook.Add("HUDPaint", "Test2", function()
 			surface.DrawTexturedRect(480, 275, 520, 60, Color(41, 128, 185, 255))
 
 			draw.RoundedBox(4, 526, ScrH()-370, 160, 1.5, Color(255,255,255, 255))
-			draw.SimpleTextOutlined("SINGULARITY", "Singularity", 540, 355, Color( 255, 255, 255, 255 ), 0, 0, 0.85, singularity.Config.MainColor)
+			draw.SimpleTextOutlined(""..singularity.__DISPLAY, "Singularity", 540, 355, Color( 255, 255, 255, 255 ), 0, 0, 0.85, singularity.Config.MainColor)
 			draw.SimpleTextOutlined("VERSION: "..singularity.__VERSION, "Singularity", 547, 375, Color( 255, 255, 255, 255 ), 0, 0, 0.85, singularity.Config.MainColor)
 			draw.SimpleTextOutlined("AUTHOR: MIKE WHITE & APSYS", "Singularity", 538.5, 402, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 255,0,0, 255 ))
 			draw.SimpleTextOutlined(""..singularity.__XTNOTES , "Singularity", 537.5, 422, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 255,0,0, 255 ))
@@ -256,7 +256,7 @@ hook.Add("HUDPaint", "MyAddo2nHUD", function()
 	if (!client:Alive()) then
 		return
 	end
-	draw.RoundedBox(4, 7, ScrH()-189, 280, 182, Color(50,50,50, 200))
+	surface.DrawRect(10,ScrH() - 200,100, 200)
 	draw.SimpleTextOutlined("Health: " .. hp, "SingularityHealth", 20, 655, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 100,100,100, 255 ))
 	draw.SimpleTextOutlined("Armor: " ..armour, "SingularityHealth", 20, 675, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 100,100,100, 255 ))
 	draw.SimpleTextOutlined("" .. LocalPlayer():Name(), "SingularityHealth", 20, 595, Color( 255, 255, 255, 255 ), 0, 0, 0.85, Color( 100,100,100, 255 ))

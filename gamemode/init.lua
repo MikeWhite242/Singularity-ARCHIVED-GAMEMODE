@@ -15,6 +15,19 @@ function GM:PlayerSpawn(pl)
 	pl:SetDuckSpeed(0.2)
 end
 
+function GM:OnReloaded()
+  MsgC(Color(10,132,255),"[SINGULARITY] loading gamemode...\n")
+	singularity.includeDir("singularity/core")
+	MsgC(Color(10,132,255),"[SINGULARITY] loading plugins...\n")
+	singularity.includeDir("singularity/plugins")
+	MsgC(Color(10,132,255),"[SINGULARITY] loading metas...\n")
+	singularity.includeDir("singularity/meta")
+	MsgC(Color(10,132,255),"[SINGULARITY] loading VGUI's...\n")
+	singularity.includeDir("singularity/vgui")
+	MsgC(Color(10,132,255),"[SINGULARITY] loading libraries...\n")
+	singularity.includeDir("singularity/lib")
+end
+
 util.AddNetworkString("F4Menu")
 
 function GM:ShowSpare2(ply)

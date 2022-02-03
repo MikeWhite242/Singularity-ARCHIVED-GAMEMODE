@@ -10,6 +10,11 @@ GM.Website 	= "None"
 singularity = singularity or {}
 singularity.lib = singularity.lib or {}
 
+PERMISSION_LEVEL_USER       = 1
+PERMISSION_LEVEL_ADMIN      = 2
+PERMISSION_LEVEL_LEAD_ADMIN = 3
+PERMISSION_LEVEL_SUPERADMIN = 4
+
 singularity.__VERSION = "2.0"
 singularity.__DISPLAY = "Singularity Framework"
 singularity.__XTNOTES = "PREVIEW BUILD"
@@ -145,23 +150,34 @@ end
 
 if SERVER then
 	MsgC(Color(10,132,255),"[SINGULARITY] loading gamemode...\n")
-	singularity.includeDir("singularity")
+	singularity.includeDir("singularity/core")
 	MsgC(Color(10,132,255),"[SINGULARITY] loading plugins...\n")
 	singularity.includeDir("singularity/plugins")
 	MsgC(Color(10,132,255),"[SINGULARITY] loading metas...\n")
 	singularity.includeDir("singularity/meta")
 	MsgC(Color(10,132,255),"[SINGULARITY] loading VGUI's...\n")
 	singularity.includeDir("singularity/vgui")
+	MsgC(Color(10,132,255),"[SINGULARITY] loading libraries...\n")
+	singularity.includeDir("singularity/lib")
 end
 
 if CLIENT then 
 	MsgC(Color(10,132,255),"[SINGULARITY] loading gamemode...\n")
-	singularity.includeDir("singularity")
+	singularity.includeDir("singularity/core")
 	MsgC(Color(10,132,255),"[SINGULARITY] loading plugins...\n")
 	singularity.includeDir("singularity/plugins")
 	MsgC(Color(10,132,255),"[SINGULARITY] loading metas...\n")
 	singularity.includeDir("singularity/meta")
 	MsgC(Color(10,132,255),"[SINGULARITY] loading VGUI's...\n")
 	singularity.includeDir("singularity/vgui")
+	MsgC(Color(10,132,255),"[SINGULARITY] loading libraries...\n")
+	singularity.includeDir("singularity/lib")
+end
 
+
+function singularity.SafeString(s)
+	local pat = "[^0-9a-zA-Z%s]+"
+	local cln =s
+	cln = string.gsub(cln, pat, "")
+	return cln
 end

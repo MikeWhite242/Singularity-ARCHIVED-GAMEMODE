@@ -2,6 +2,19 @@ include( "shared.lua" )
 AddCSLuaFile("vgui/cl_notify.lua")
 AddCSLuaFile("vgui/cl_spawnicon.lua")
 
+function GM:OnReloaded()
+  MsgC(Color(10,132,255),"[SINGULARITY] loading gamemode...\n")
+	singularity.includeDir("singularity/core")
+	MsgC(Color(10,132,255),"[SINGULARITY] loading plugins...\n")
+	singularity.includeDir("singularity/plugins")
+	MsgC(Color(10,132,255),"[SINGULARITY] loading metas...\n")
+	singularity.includeDir("singularity/meta")
+	MsgC(Color(10,132,255),"[SINGULARITY] loading VGUI's...\n")
+	singularity.includeDir("singularity/vgui")
+	MsgC(Color(10,132,255),"[SINGULARITY] loading libraries...\n")
+	singularity.includeDir("singularity/lib")
+end
+
 net.Receive("F4Menu",function()
   if ( !f4 ) then
     local f4 = vgui.Create( "DFrame" )
